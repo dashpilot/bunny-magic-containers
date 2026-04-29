@@ -1,4 +1,5 @@
 .git
+.github
 .gitignore
 docker-compose.yml
 .DS_Store
