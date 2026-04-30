@@ -12,20 +12,33 @@ docker compose up --build
 
 Open **http://localhost:8080/**.
 
-## Deploy on bunny.net (recommended: GitHub repo)
+## Deploy on bunny.net
 
-If your repository is **public**, Bunny can **build from your repo** and deploy without a separate container registry or GitHub Actions.
+Point Magic Containers at **GitHub Container Registry (GHCR)** — for example **Registry: GitHub Public** and image **`your-user/bunny-magic-containers`** with tag **`latest`** or a commit SHA. Endpoint **container port: 80**.
 
-1. In the [bunny.net](https://bunny.net) dashboard, open **Magic Containers** and create an app (or use **Deploy** / the flow that connects GitHub).
-2. Choose the option to deploy from a **GitHub** repository and authorize access if asked.
-3. Select this repo and branch (usually `main`).
-4. Ensure the **container port** for the HTTP endpoint is **80** (matches this `Dockerfile`).
+That UI reads from the **image in GHCR**, not from raw Git commits. To refresh the site after you change code, a **new image** must be built and pushed (this repo does that with **GitHub Actions** below).
 
-Bunny builds the image from the **`Dockerfile` at the repository root** and rolls out your app. Official overview: [Magic Containers documentation](https://docs.bunny.net/magic-containers).
+### GitHub Actions (build, push, optional Bunny update)
+
+On every push to **`main`**, [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml):
+
+1. Builds **`linux/amd64`** and pushes to GHCR as **`:latest`** and **`:<commit-sha>`**.
+2. If the repo variable **`APP_ID`** is set, calls Bunny’s **[container-update-image](https://docs.bunny.net/magic-containers/deploy-with-github-actions)** action so Magic Containers rolls to the new **SHA** tag (same flow as [Update App](https://docs.bunny.net/magic-containers/update), but automated).
+
+**One-time GitHub setup**
+
+1. **Packages:** Repository **Settings → Actions → General → Workflow permissions** — enable **Read and write** so `GITHUB_TOKEN` can push to GHCR (or use a PAT; see [GitHub Packages docs](https://docs.github.com/en/packages/learn-github-packages/publishing-a-package)).
+2. **Bunny API key:** **Settings → Secrets and variables → Actions → Secrets** — add **`BUNNYNET_API_KEY`** (your bunny.net account API key; sub-users may be unsupported — see Bunny’s action docs).
+3. **App ID:** **Settings → Secrets and variables → Actions → Variables** — add **`APP_ID`** with your Magic Containers app id from the Bunny dashboard. If **`APP_ID`** is empty, the workflow still builds and pushes to GHCR, but skips the Bunny update step.
+4. **Container name (optional):** Variable **`BUNNY_CONTAINER`** — name of the container inside the app (default in the workflow is **`Container-1`**). Set this if yours differs.
+
+**Bunny dashboard**
+
+- Image should match GHCR, e.g. **`dashpilot/bunny-magic-containers`** with tag **`latest`** (Actions overwrites `latest` each run) **or** rely on the action to set the deployment to the **SHA** tag when `APP_ID` is configured.
 
 ### Private repositories
 
-If the repo is private, you typically need either **registry-based deploy** (build and push an image to GHCR or Docker Hub, then point Magic Containers at that image) or whatever private-Git integration Bunny documents at the time. Check the current [deploy guide](https://docs.bunny.net/docs/magic-containers-how-to-deploy-your-app) for options.
+GHCR and Bunny may need extra auth for private packages; see the [Magic Containers deploy guide](https://docs.bunny.net/docs/magic-containers-how-to-deploy-your-app).
 
 ## Project layout
 
@@ -34,6 +47,7 @@ If the repo is private, you typically need either **registry-based deploy** (bui
 | `Dockerfile` | `php:8.3-apache`, copies `public/` into the web root, exposes **80** |
 | `public/` | Site: `index.php`, `about.php`, `contact.php`, shared layout and CSS |
 | `docker-compose.yml` | Local dev: map host **8080** → container **80**, `linux/amd64` |
+| `.github/workflows/deploy.yml` | CI: GHCR push + optional Bunny rolling update |
 
 ## Notes
 
