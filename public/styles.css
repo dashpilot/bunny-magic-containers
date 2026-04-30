@@ -111,6 +111,10 @@ a:hover {
     border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.card + .card {
+    margin-top: 1.25rem;
+}
+
 .card h2 {
     margin: 0 0 0.75rem;
     font-size: 1.25rem;
@@ -181,6 +185,30 @@ button:hover {
     margin-top: 1rem;
     font-size: 0.875rem;
     color: var(--muted);
+}
+
+.comments {
+    display: grid;
+    gap: 1rem;
+}
+
+.comment {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.comment:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+.comment .note {
+    margin-top: 0;
+    color: var(--muted);
+}
+
+.comment p:not(.note) {
+    color: var(--text);
 }
 
 code {

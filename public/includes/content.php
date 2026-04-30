@@ -32,33 +32,81 @@ function render_about_content(): void
     <?php
 }
 
-function render_contact_content(bool $submitted): void
+/**
+ * @param array<int, array{name: string, email: string, message: string, createdAt: string}> $comments
+ * @param array{name: string, email: string, message: string} $values
+ * @param array<string, string> $errors
+ */
+function render_contact_content(array $comments, array $values, array $errors, bool $success): void
 {
     ?>
     <section class="hero">
-        <h1>Contact</h1>
-        <p class="lead">Demo form — nothing is stored or sent.</p>
+        <h1>Comments</h1>
+        <p class="lead">Leave a note below. Comments are saved to a JSON file on the container’s persistent volume.</p>
     </section>
     <div class="card">
-        <?php if ($submitted) { ?>
+        <?php if ($success) { ?>
             <h2>Thanks</h2>
-            <p>Your message was not saved (this is a static demo). Hook this up to email or an API when you are ready.</p>
-            <p><a href="/contact">Send another</a></p>
+            <p>Your comment was saved.</p>
+        <?php } ?>
+
+        <h2>Leave a comment</h2>
+        <form method="post" action="/contact" novalidate>
+            <label for="name">Name</label>
+            <input
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                required
+                value="<?= htmlspecialchars($values['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+            >
+            <?php if (isset($errors['name'])) { ?>
+                <p class="note" role="alert"><?= htmlspecialchars($errors['name'], ENT_QUOTES, 'UTF-8') ?></p>
+            <?php } ?>
+
+            <label for="email">Email (optional)</label>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                value="<?= htmlspecialchars($values['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+            >
+            <?php if (isset($errors['email'])) { ?>
+                <p class="note" role="alert"><?= htmlspecialchars($errors['email'], ENT_QUOTES, 'UTF-8') ?></p>
+            <?php } ?>
+
+            <label for="message">Comment</label>
+            <textarea id="message" name="message" required><?= htmlspecialchars($values['message'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+            <?php if (isset($errors['message'])) { ?>
+                <p class="note" role="alert"><?= htmlspecialchars($errors['message'], ENT_QUOTES, 'UTF-8') ?></p>
+            <?php } ?>
+
+            <button type="submit">Post comment</button>
+        </form>
+        <p class="note">Saved to <code>/data/comments.json</code> on the persistent volume.</p>
+    </div>
+
+    <div class="card">
+        <h2>Recent comments</h2>
+        <?php if ($comments === []) { ?>
+            <p class="note">No comments yet.</p>
         <?php } else { ?>
-            <h2>Get in touch</h2>
-            <form method="post" action="/contact">
-                <label for="name">Name</label>
-                <input id="name" name="name" type="text" autocomplete="name" required>
-
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" autocomplete="email" required>
-
-                <label for="message">Message</label>
-                <textarea id="message" name="message" required></textarea>
-
-                <button type="submit">Send</button>
-            </form>
-            <p class="note">POST requests work the same on Magic Containers once deployed.</p>
+            <div class="comments">
+                <?php foreach ($comments as $comment) { ?>
+                    <article class="comment">
+                        <p class="note">
+                            <strong><?= htmlspecialchars($comment['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <?php if ($comment['email'] !== '') { ?>
+                                <span>· <?= htmlspecialchars($comment['email'], ENT_QUOTES, 'UTF-8') ?></span>
+                            <?php } ?>
+                            <span>· <?= htmlspecialchars($comment['createdAt'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </p>
+                        <p><?= nl2br(htmlspecialchars($comment['message'], ENT_QUOTES, 'UTF-8')) ?></p>
+                    </article>
+                <?php } ?>
+            </div>
         <?php } ?>
     </div>
     <?php
