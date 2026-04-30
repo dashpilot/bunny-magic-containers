@@ -47,7 +47,8 @@ GHCR and Bunny may need extra auth for private packages; see the [Magic Containe
 | Path | Purpose |
 |------|--------|
 | `Dockerfile` | `php:8.3-apache`, copies `public/` into the web root, exposes **80** |
-| `public/` | Site: `index.php`, `about.php`, `contact.php`, shared layout and CSS |
+| `public/` | Front controller `index.php`, `.htaccess` (pretty URLs → `index.php`), `includes/`, `styles.css` |
+| `docker/apache-allow-htaccess.conf` | Enables `AllowOverride All` so Apache reads `.htaccess` |
 | `docker-compose.yml` | Local dev: map host **8080** → container **80**, `linux/amd64` |
 | `.github/workflows/deploy.yml` | CI: GHCR push + optional Bunny rolling update |
 

@@ -3,17 +3,39 @@
 declare(strict_types=1);
 
 require __DIR__ . '/includes/layout.php';
+require __DIR__ . '/includes/content.php';
 
-render_layout('Home', 'home', static function (): void {
-    ?>
-    <section class="hero">
-        <h1>And how about now?</h1>
-        <p class="lead">This is a tiny three-page site you can run locally with Docker, then ship to Bunny Magic Containers.</p>
-    </section>
-    <div class="card">
-        <h2>What you get</h2>
-        <p>Plain PHP and Apache on port 80 inside the container — the same shape Bunny’s docs use for PHP examples.</p>
-        <p>Use the nav above to visit About and Contact.</p>
-    </div>
-    <?php
-});
+$rawPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$path = is_string($rawPath) ? rtrim($rawPath, '/') : '';
+$path = $path === '' ? '/' : $path;
+if ($path === '/index.php') {
+    $path = '/';
+}
+
+if ($path === '/about.php') {
+    header('Location: /about', true, 301);
+    exit;
+}
+if ($path === '/contact.php') {
+    header('Location: /contact', true, 301);
+    exit;
+}
+
+switch ($path) {
+    case '/':
+        render_layout('Home', 'home', 'render_home_content');
+        break;
+    case '/about':
+        render_layout('About', 'about', 'render_about_content');
+        break;
+    case '/contact':
+        $submitted = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
+        render_layout('Contact', 'contact', static function () use ($submitted): void {
+            render_contact_content($submitted);
+        });
+        break;
+    default:
+        http_response_code(404);
+        render_layout('Not found', '', 'render_not_found_content');
+        break;
+}

@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Legacy .php URLs → pretty paths
+    RewriteRule ^about\.php$ /about [R=301,L]
+    RewriteRule ^contact\.php$ /contact [R=301,L]
+
+    # Existing files (e.g. styles.css) and directories are served as-is
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>

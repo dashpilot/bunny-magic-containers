@@ -24,8 +24,8 @@ function render_layout(string $title, string $active, callable $content): void
             <a class="logo" href="<?= $base ?>/">Bunny Demo</a>
             <nav aria-label="Main">
                 <a href="<?= $base ?>/"<?= $active === 'home' ? ' class="active" aria-current="page"' : '' ?>>Home</a>
-                <a href="<?= $base ?>/about.php"<?= $active === 'about' ? ' class="active" aria-current="page"' : '' ?>>About</a>
-                <a href="<?= $base ?>/contact.php"<?= $active === 'contact' ? ' class="active" aria-current="page"' : '' ?>>Contact</a>
+                <a href="<?= $base ?>/about"<?= $active === 'about' ? ' class="active" aria-current="page"' : '' ?>>About</a>
+                <a href="<?= $base ?>/contact"<?= $active === 'contact' ? ' class="active" aria-current="page"' : '' ?>>Contact</a>
             </nav>
         </div>
     </header>
