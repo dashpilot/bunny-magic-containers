@@ -6,7 +6,7 @@ function render_home_content(): void
 {
     ?>
     <section class="hero">
-        <h1>And how about now?</h1>
+        <h1>Php running in a Docker container</h1>
         <p class="lead">This is a tiny three-page site you can run locally with Docker, then ship to Bunny Magic Containers.</p>
     </section>
     <div class="card">
