@@ -36,6 +36,8 @@ On every push to **`main`**, [`.github/workflows/deploy.yml`](.github/workflows/
 
 - Image should match GHCR, e.g. **`dashpilot/bunny-magic-containers`** with tag **`latest`** (Actions overwrites `latest` each run) **or** rely on the action to set the deployment to the **SHA** tag when `APP_ID` is configured.
 
+After a successful workflow, Bunny may show a banner like **“New version … tag: latest … Apply Update”** for **Container-1**. That means GHCR has a new digest for `latest`; click **Apply Update** to pull and redeploy. If you configure **`APP_ID`** and the **`container-update-image`** step runs successfully, Bunny can roll to the **commit SHA** tag automatically; you might still see dashboard prompts depending on how the app is wired—either way, **Apply Update** applies the new image you just pushed.
+
 ### Private repositories
 
 GHCR and Bunny may need extra auth for private packages; see the [Magic Containers deploy guide](https://docs.bunny.net/docs/magic-containers-how-to-deploy-your-app).

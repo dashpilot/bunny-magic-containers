@@ -7,7 +7,7 @@ require __DIR__ . '/includes/layout.php';
 render_layout('Home', 'home', static function (): void {
     ?>
     <section class="hero">
-        <h1>This is an updated page in the Docker container!</h1>
+        <h1>Does this now auto deploy?</h1>
         <p class="lead">This is a tiny three-page site you can run locally with Docker, then ship to Bunny Magic Containers.</p>
     </section>
     <div class="card">
