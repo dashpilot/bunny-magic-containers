@@ -4,3 +4,5 @@ services:
     ports:
       - "8080:80"
     platform: linux/amd64
+    volumes:
+      - ./data:/data

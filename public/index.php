@@ -28,6 +28,19 @@ switch ($path) {
     case '/about':
         render_layout('About', 'about', 'render_about_content');
         break;
+    case '/comments.json':
+        $commentsFile = '/data/comments.json';
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        if (is_file($commentsFile)) {
+            $raw = @file_get_contents($commentsFile);
+            if (is_string($raw) && $raw !== '') {
+                echo $raw;
+                exit;
+            }
+        }
+        echo "[]\n";
+        exit;
     case '/contact':
         $commentsFile = '/data/comments.json';
         $strlen = static function (string $value): int {
@@ -132,6 +145,10 @@ switch ($path) {
             $values['name'] = is_string($_POST['name'] ?? null) ? trim((string)$_POST['name']) : '';
             $values['email'] = is_string($_POST['email'] ?? null) ? trim((string)$_POST['email']) : '';
             $values['message'] = is_string($_POST['message'] ?? null) ? trim((string)$_POST['message']) : '';
+
+            if (!is_dir('/data') || !is_writable('/data')) {
+                $errors['form'] = 'Storage is not writable. Ensure a persistent volume is mounted at /data and writable by the web server user.';
+            }
 
             if ($values['name'] === '') {
                 $errors['name'] = 'Please enter your name.';

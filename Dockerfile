@@ -8,4 +8,9 @@ RUN a2enmod rewrite \
 
 COPY public/ /var/www/html/
 
+COPY docker/entrypoint.sh /usr/local/bin/bunny-entrypoint
+RUN chmod +x /usr/local/bin/bunny-entrypoint
+
+ENTRYPOINT ["/usr/local/bin/bunny-entrypoint"]
+
 EXPOSE 80
