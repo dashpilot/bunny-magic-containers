@@ -55,4 +55,9 @@ GHCR and Bunny may need extra auth for private packages; see the [Magic Containe
 ## Notes
 
 - **Architecture:** Magic Containers expects **linux/amd64** images. `docker-compose.yml` sets `platform: linux/amd64` so local builds match production on Apple Silicon.
-- **No database** — the contact form is a demo only; nothing is stored.
+- **Persistent volume** — Bunny mounts a volume at `/data`. The contact form stores comments as JSON at `/data/comments.json` so they survive container restarts.
+- **Image hosting (Bunny Storage)** — uploaded images are pushed to a [Bunny Storage](https://docs.bunny.net/docs/storage-zones) zone over HTTP and served from a Pull Zone CDN URL. Configure it in [`public/includes/config.php`](public/includes/config.php):
+  - `subfolder` — the path inside the storage zone where comment images live (e.g. `comment-images`). Edit this in `config.php`.
+  - `zone`, `access_key`, `pull_zone`, optional `hostname` (for replicated zones) — default to the env vars `BUNNY_STORAGE_ZONE`, `BUNNY_STORAGE_KEY`, `BUNNY_PULL_ZONE`, `BUNNY_STORAGE_HOSTNAME`. Set them on the host shell or a `.env` file next to `docker-compose.yml`; on Bunny, add them to the container's environment variables.
+  - When `BUNNY_STORAGE_ZONE`/`BUNNY_STORAGE_KEY`/`BUNNY_PULL_ZONE` aren't set, the contact page hides the image input and comments still work.
+- **Uploads** — accepted types are JPEG, PNG, GIF, and WebP (max 5 MB). PHP limits are bumped via [`docker/php-uploads.ini`](docker/php-uploads.ini). Each upload is validated (MIME via `finfo`, size, error code) before PHP PUTs it to Bunny Storage.

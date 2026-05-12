@@ -6,3 +6,11 @@ services:
     platform: linux/amd64
     volumes:
       - ./data:/data
+    environment:
+      # Bunny Storage settings — passed through from the host shell or a .env
+      # file next to this docker-compose.yml. Leave them unset for a basic
+      # local run (image uploads will be disabled gracefully).
+      BUNNY_STORAGE_ZONE: ${BUNNY_STORAGE_ZONE:-}
+      BUNNY_STORAGE_KEY: ${BUNNY_STORAGE_KEY:-}
+      BUNNY_STORAGE_HOSTNAME: ${BUNNY_STORAGE_HOSTNAME:-storage.bunnycdn.com}
+      BUNNY_PULL_ZONE: ${BUNNY_PULL_ZONE:-}
